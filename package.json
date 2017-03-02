@@ -1,12 +1,12 @@
 {
-    "name": "match",
+    "name": "@mkrause/match.js",
     "version": "1.0.0-alpha1",
-    "description": "Match over different cases.",
+    "description": "Pattern matching utility for JavaScript.",
     "author": "mkrause",
     "license": "MIT",
     "repository": "https://github.com/mkrause/match.js",
     
-    "main": "src/main.js",
+    "main": "src/match.js",
     "scripts": {
         "test": "mocha --recursive tests"
     },
