@@ -1,6 +1,6 @@
 {
-    "name": "@mkrause/match.js",
-    "version": "1.0.0-alpha1",
+    "name": "@mkrause/match",
+    "version": "1.0.0",
     "description": "Pattern matching utility for JavaScript.",
     "author": "mkrause",
     "license": "MIT",
