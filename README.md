@@ -14,7 +14,7 @@ Using an object:
         foo: 42,
         bar: 43,
     });
-    result === true;
+    result === 42;
 ```
 
 Using a predicate list:
