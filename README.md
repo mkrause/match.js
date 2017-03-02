@@ -1,7 +1,7 @@
 
 # match.js
 
-Basic JavaScript pattern matching utility.
+JavaScript pattern matching utility.
 
 
 ## Usage
@@ -21,11 +21,12 @@ Using a predicate list:
 
 ```js
     const { match } = require('@mkrause/match.js');
-    const result = match('foo', {
-        foo: 42,
-        bar: 43,
-    });
-    result === true;
+    const result = match({ value: 42 }, [
+        match.case(({ value }) => value > 0, +1),
+        match.case(({ value }) => value == 0, 0),
+        match.case(({ value }) => value < 0, -1),
+    ]);
+    result === 1;
 ```
 
 
