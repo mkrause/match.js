@@ -1,3 +1,4 @@
+'use strict';
 
 const _ = require('lodash');
 
@@ -7,20 +8,20 @@ Similar:
 - https://github.com/FGRibreau/match-when
 */
 
-const match = (value, ...cases) => {
+const match = (subject, ...cases) => {
     if (cases.length === 1 && _.isPlainObject(cases[0])) {
         const mapping = cases[0];
         let result;
-        if (mapping.hasOwnProperty(value)) {
-            result = mapping[value];
+        if (mapping.hasOwnProperty(subject)) {
+            result = mapping[subject];
         } else if (mapping.hasOwnProperty(match.default)) {
             result = mapping[match.default];
         } else {
-            throw new Error(`[match.js] Unmatched case: ${JSON.stringify(value)}`);
+            throw new Error(`[match.js] Unmatched case: ${JSON.stringify(subject)}`);
         }
         
         if (_.isFunction(result)) {
-            return result(value);
+            return result(subject);
         } else {
             return result;
         }
@@ -30,16 +31,16 @@ const match = (value, ...cases) => {
                 guard = _.matches(guard);
             }
             
-            if (guard(value)) {
+            if (guard(subject)) {
                 if (_.isFunction(result)) {
-                    return result(value);
+                    return result(subject);
                 } else {
                     return result;
                 }
             }
         }
         
-        throw new Error(`[match.js] Unmatched case: ${JSON.stringify(value)}`);
+        throw new Error(`[match.js] Unmatched case: ${JSON.stringify(subject)}`);
     }
 };
 

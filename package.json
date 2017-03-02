@@ -4,39 +4,17 @@
     "description": "Match over different cases.",
     "author": "mkrause",
     "license": "MIT",
-    "repository": "https://github.com/mkrause/mu-js",
+    "repository": "https://github.com/mkrause/match.js",
     
     "main": "src/main.js",
     "scripts": {
+        "test": "mocha --recursive tests"
     },
     
     "dependencies": {
-        "gulp": "^3.9.1",
-        "gulp-util": "^3.0.7",
-        
-        "webpack": "^1.13.2",
-        "webpack-stream": "^3.2.0",
-        "webpack-dev-server": "^1.16.1",
-        "babel-core": "^6.16.0",
-        "babel-cli": "6.22.2",
-        "babel-polyfill": "^6.16.0",
-        "babel-preset-es2015": "^6.16.0",
-        "babel-preset-es2016": "^6.16.0",
-        "babel-preset-es2017": "^6.16.0",
-        "babel-plugin-transform-es2015-modules-commonjs": "^6.18.0",
-        "babel-preset-modern-browsers": "^6.0.0",
-        "babel-plugin-transform-object-rest-spread": "^6.20.1",
-        "babel-plugin-transform-class-properties": "^6.16.0",
-        "babel-plugin-transform-function-bind": "^6.8.0",
-        "babel-preset-react": "^6.16.0",
-        "react-hot-loader": "^1.3.0",
-        "babel-loader": "^6.2.5",
-        
-        "flow-bin": "^0.32.0",
-        "babel-plugin-transform-flow-strip-types": "^6.18.0",
-        
-        "common-tags": "^1.3.1",
-        "lodash": "^4.15.0",
-        "immutable": "^3.8.1"
+        "lodash": "^4.15.0"
+    },
+    "devDependencies": {
+        "mocha": "^3.2.0"
     }
 }
