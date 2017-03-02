@@ -9,7 +9,7 @@ JavaScript pattern matching utility.
 Using an object:
 
 ```js
-    const { match } = require('@mkrause/match.js');
+    const { match } = require('@mkrause/match');
     const result = match('foo', {
         foo: 42,
         bar: 43,
@@ -20,7 +20,7 @@ Using an object:
 Using a predicate list:
 
 ```js
-    const { match } = require('@mkrause/match.js');
+    const { match } = require('@mkrause/match');
     const result = match({ value: 42 }, [
         match.case(({ value }) => value > 0, +1),
         match.case(({ value }) => value == 0, 0),
@@ -35,7 +35,7 @@ Using a predicate list:
 You can create your own custom `match` function. For example, let's say our React/Redux/Flux application makes use of actions that conform to the [Flux Standard Action (FSA)](https://github.com/acdlite/flux-standard-action) protocol. We could create a matcher as follows:
 
 ```js
-    const { matcher } = require('@mkrause/match.js');
+    const { matcher } = require('@mkrause/match');
     
     const match = matcher(subject => {
         return { discriminator: subject.type, body: subject };
@@ -54,7 +54,7 @@ We supply a couple of common matchers out of the box:
 - `matchSingleKey`: match on objects with a single property, e.g. `{ MY_TYPE: { value: 42 } }`
 
 ```js
-    const { matchType, matchSingleKey } = require('@mkrause/match.js');
+    const { matchType, matchSingleKey } = require('@mkrause/match');
     
     const action = { type: 'CREATE_USER', error: false, payload: { name: 'John' } };
     matchType(action, {
