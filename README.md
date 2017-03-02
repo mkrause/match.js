@@ -41,9 +41,9 @@ You can create your own custom `match` function. For example, let's say our Reac
         return { discriminator: subject.type, body: subject };
     });
     
-    const action = { type: 'CREATE_USER', payload: { name: 'John' } };
+    const action = { type: 'CREATE_USER', error: false, payload: { name: 'John' } };
     const result = match(action, {
-        CREATE_USER: () => { /* ... */ },
+        CREATE_USER: ({ error, payload }) => doSomethingWith(payload),
     });
 ```
 
@@ -52,6 +52,19 @@ We supply a couple of common matchers out of the box:
 - `match`: generic matcher
 - `matchType`: match on objects with a `type` property
 - `matchSingleKey`: match on objects with a single property, e.g. `{ MY_TYPE: { value: 42 } }`
+
+```js
+    const { matchType, matchSingleKey } = require('@mkrause/match.js');
+    
+    const action = { type: 'CREATE_USER', error: false, payload: { name: 'John' } };
+    matchType(action, {
+        CREATE_USER: ({ error, payload }) => doSomethingWith(payload),
+    });
+    
+    matchSingleKey({ CREATE_USER: { name: 'John' } }, {
+        CREATE_USER: user => doSomethingWith(user),
+    });
+```
 
 
 ## Similar libraries
