@@ -3,6 +3,23 @@
 const _ = require('lodash');
 
 
+// Utility
+
+export const getSingleKey = obj => {
+    if (!_.isObject(obj)) {
+        throw new Error(`Error: expected object, given '${JSON.stringify(obj)}'`);
+    }
+    
+    const keys = Object.keys(obj);
+    if (keys.length !== 1) {
+        throw new Error(`Error: expected object with single key, given '${JSON.stringify(obj)}'`);
+    }
+    
+    const key = keys[0];
+    return { key, value: obj[key] };
+};
+
+
 // Common definitions
 const defaultCase = Symbol('match.default');
 const defs = {
