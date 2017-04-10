@@ -6,7 +6,7 @@ const _ = require('lodash');
 // Utility
 
 const getSingleKey = obj => {
-    if (!_.isObject(obj)) {
+    if (!_.isPlainObject(obj)) {
         throw new Error(`Error: expected object, given '${JSON.stringify(obj)}'`);
     }
     
