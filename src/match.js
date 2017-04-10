@@ -5,7 +5,7 @@ const _ = require('lodash');
 
 // Utility
 
-export const getSingleKey = obj => {
+const getSingleKey = obj => {
     if (!_.isObject(obj)) {
         throw new Error(`Error: expected object, given '${JSON.stringify(obj)}'`);
     }
@@ -143,7 +143,7 @@ const matchSingleKey = matcher(subject => {
     return { discriminator, body: subject[discriminator] };
 });
 
-module.exports = { matcher, match, matchType, matchSingleKey };
+module.exports = { matcher, match, matchType, getSingleKey, matchSingleKey };
 
 // ES6 module interop
 module.exports['default'] = match;
