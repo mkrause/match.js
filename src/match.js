@@ -24,7 +24,7 @@ const getSingleKey = obj => {
 const defaultCase = Symbol('match.default');
 const defs = {
     case: (predicate, value) => [predicate, value],
-    otherwise: fn => [defaultCase, fn ],
+    otherwise: fn => [defaultCase, fn],
     default: defaultCase,
 };
 
