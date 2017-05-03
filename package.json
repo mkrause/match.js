@@ -7,7 +7,6 @@
     "repository": "https://github.com/mkrause/match.js",
     
     "main": "dist/match.js",
-    "module": "src/match.js",
     
     "scripts": {
         "test": "mocha --recursive tests"
