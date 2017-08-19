@@ -1,6 +1,6 @@
 {
     "name": "@mkrause/match",
-    "version": "1.0.15",
+    "version": "1.0.16",
     "description": "Case matching utility.",
     "author": "mkrause",
     "license": "MIT",
@@ -13,7 +13,8 @@
     
     "files": [
         "src/",
-        "lib/",
+        "lib-cjs/",
+        "lib-es/",
         "tests/"
     ],
     "scripts": {
