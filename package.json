@@ -1,30 +1,32 @@
 {
     "name": "@mkrause/match",
-    "version": "1.0.9",
-    "description": "Matching utility for JavaScript.",
+    "version": "1.0.10",
+    "description": "Case matching utility.",
     "author": "mkrause",
     "license": "MIT",
     "repository": "https://github.com/mkrause/match.js",
-    
-    "main": "dist/match.js",
-    
+    "module": "src/match.js",
+    "main": "lib/match.js",
+    "browser": "dist/match.js",
     "scripts": {
-        "test": "mocha --recursive tests"
-    },
-    
-    "dependencies": {
-        "lodash": "^4.15.0"
+        "build:lib": "NODE_ENV=production babel src --out-dir lib --source-maps inline",
+        "build:bundle": "NODE_ENV=production webpack -p",
+        "test": "mocha --recursive tests",
+        
+        "prepublishOnly": "npm run build:lib && npm test"
     },
     "devDependencies": {
         "babel-core": "^6.16.0",
+        "babel-cli": "^6.24.1",
         "babel-preset-es2015": "^6.16.0",
         "babel-preset-es2016": "^6.16.0",
         "babel-preset-es2017": "^6.16.0",
         "babel-plugin-transform-object-rest-spread": "^6.20.1",
-        
-        "webpack": "^2.2.1",
-        "babel-loader": "^6.3.2",
-        
-        "mocha": "^3.2.0"
+        "webpack": "^3.5.5",
+        "babel-loader": "^7.1.2",
+        "mocha": "^3.5.0"
+    },
+    "dependencies": {
+        "lodash": "^4.15.0"
     }
 }
