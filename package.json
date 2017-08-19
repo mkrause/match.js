@@ -1,6 +1,6 @@
 {
     "name": "@mkrause/match",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "description": "Case matching utility.",
     "author": "mkrause",
     "license": "MIT",
@@ -22,7 +22,7 @@
         "build:bundle": "NODE_ENV=production webpack -p",
         "test": "mocha --recursive tests",
         
-        "prepublishOnly": "npm run build:lib"
+        "prepublishOnly": "npm run build:lib-cjs && npm run build:lib-es"
     },
     "devDependencies": {
         "babel-core": "^6.16.0",
