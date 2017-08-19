@@ -1,6 +1,6 @@
 {
     "name": "@mkrause/match",
-    "version": "1.0.18",
+    "version": "1.0.19",
     "description": "Case matching utility.",
     "author": "mkrause",
     "license": "MIT",
@@ -14,8 +14,7 @@
     "files": [
         "src/",
         "lib-cjs/",
-        "lib-es/",
-        "tests/"
+        "lib-es/"
     ],
     "scripts": {
         "build:cjs": "NODE_ENV=production BABEL_ENV=cjs babel src --out-dir lib-cjs --source-maps inline",
