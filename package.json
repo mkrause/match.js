@@ -1,20 +1,24 @@
 {
     "name": "@mkrause/match",
-    "version": "1.0.12",
+    "version": "1.0.13",
     "description": "Case matching utility.",
     "author": "mkrause",
     "license": "MIT",
     "repository": "https://github.com/mkrause/match.js",
-    "module": "src/match.js",
-    "main": "lib/match.js",
-    "browser": "dist/match.js",
-      "files": [
+    
+    "es2015": "src/match.js",
+    "main": "lib-cjs/match.js",
+    "module": "lib-es/match.js",
+    "browser": "lib-es/match.js",
+    
+    "files": [
         "src/",
         "lib/",
         "tests/"
     ],
     "scripts": {
-        "build:lib": "NODE_ENV=production babel src --out-dir lib --source-maps inline",
+        "build:cjs": "NODE_ENV=production BABEL_ENV=cjs babel src --out-dir lib-cjs --source-maps inline",
+        "build:es": "NODE_ENV=production BABEL_ENV=es babel src --out-dir lib-es --source-maps inline",
         "build:bundle": "NODE_ENV=production webpack -p",
         "test": "mocha --recursive tests",
         

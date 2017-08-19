@@ -1,6 +1,5 @@
-'use strict';
 
-const _ = require('lodash');
+import _ from 'lodash';
 
 
 // Utility
@@ -143,8 +142,5 @@ const matchSingleKey = matcher(subject => {
     return { discriminator, body: subject[discriminator] };
 });
 
-module.exports = { matcher, match, matchType, getSingleKey, matchSingleKey };
-
-// ES6 module interop
-module.exports['default'] = match;
-module.exports.__esModule = true;
+export { matcher, match, matchType, getSingleKey, matchSingleKey };
+export default match;

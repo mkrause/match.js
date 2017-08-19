@@ -2,5 +2,6 @@
 /node_modules/
 
 # Project
-/lib/
+/lib-cjs/
+/lib-es/
 /dist/
