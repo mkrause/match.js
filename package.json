@@ -1,6 +1,6 @@
 {
     "name": "@mkrause/match",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "description": "Case matching utility.",
     "author": "mkrause",
     "license": "MIT",
@@ -8,12 +8,17 @@
     "module": "src/match.js",
     "main": "lib/match.js",
     "browser": "dist/match.js",
+      "files": [
+        "src/",
+        "lib/",
+        "tests/"
+    ],
     "scripts": {
         "build:lib": "NODE_ENV=production babel src --out-dir lib --source-maps inline",
         "build:bundle": "NODE_ENV=production webpack -p",
         "test": "mocha --recursive tests",
         
-        "prepublishOnly": "npm run build:lib && npm test"
+        "prepublishOnly": "npm run build:lib"
     },
     "devDependencies": {
         "babel-core": "^6.16.0",
