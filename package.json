@@ -17,7 +17,6 @@
     "scripts": {
         "build:cjs": "NODE_ENV=production BABEL_ENV=cjs babel src --out-dir lib-cjs --source-maps inline",
         "build:es": "NODE_ENV=production BABEL_ENV=es babel src --out-dir lib-es --source-maps inline",
-        "build:bundle": "NODE_ENV=production webpack -p",
         "test": "NODE_ENV=development BABEL_ENV=cjs mocha --compilers js:@babel/register --recursive tests",
         "prepublishOnly": "npm run build:cjs && npm run build:es"
     },
