@@ -2,22 +2,22 @@
 const assert = require('assert');
 const { match, matchType, matchSingleKey } = require('../src/match.js');
 
-describe('match.js', function() {
-    describe('match', function() {
-        it('should fail on lack of match subject', function() {
+describe('match.js', () => {
+    describe('match', () => {
+        it('should fail on lack of match subject', () => {
             assert.throws(() => { match(); });
         });
         
-        it('should fail on lack of match cases', function() {
+        it('should fail on lack of match cases', () => {
             assert.throws(() => { match('foo'); });
         });
         
-        describe('cases through plain object', function() {
-            it('should fail on lack of cases', function() {
+        describe('cases through plain object', () => {
+            it('should fail on lack of cases', () => {
                 assert.throws(() => { match('foo', {}); });
             });
             
-            it('should match string subject with property name', function() {
+            it('should match string subject with property name', () => {
                 const actual = match('foo', {
                     foo: true,
                     bar: false,
@@ -25,7 +25,7 @@ describe('match.js', function() {
                 assert.strictEqual(actual, true);
             });
             
-            it('should fail if no match is found, and there is no `match.default`', function() {
+            it('should fail if no match is found, and there is no `match.default`', () => {
                 assert.throws(() => {
                     match('unmatched', {
                         x: false,
@@ -34,7 +34,7 @@ describe('match.js', function() {
                 });
             });
             
-            it('should select `match.default` if no match is found', function() {
+            it('should select `match.default` if no match is found', () => {
                 const actual = match('unmatched', {
                     x: false,
                     y: false,
@@ -43,7 +43,7 @@ describe('match.js', function() {
                 assert.strictEqual(actual, true);
             });
             
-            it('should pass the subject as body to any function', function() {
+            it('should pass the subject as body to any function', () => {
                 const actual = match('foo', {
                     foo: subject => subject,
                 });
@@ -51,12 +51,12 @@ describe('match.js', function() {
             });
         });
         
-        describe('cases through predicate list', function() {
-            it('should fail on lack of predicates', function() {
+        describe('cases through predicate list', () => {
+            it('should fail on lack of predicates', () => {
                 assert.throws(() => { match('foo', []); });
             });
             
-            it('should perform structural match on object given as predicate', function() {
+            it('should perform structural match on object given as predicate', () => {
                 const actual = match({ type: 'x' }, [
                     match.case({ type: 'x' }, true),
                     match.case({ type: 'y' }, false),
@@ -64,7 +64,7 @@ describe('match.js', function() {
                 assert.strictEqual(actual, true);
             });
             
-            it('should apply a function predicate with the subject body as argument', function() {
+            it('should apply a function predicate with the subject body as argument', () => {
                 const actual = match('foo', [
                     match.case(x => x === 'bar', false),
                     match.case(x => x === 'foo', true),
@@ -72,7 +72,7 @@ describe('match.js', function() {
                 assert.strictEqual(actual, true);
             });
             
-            it('should fail if no match is found, and there is no `match.otherwise`', function() {
+            it('should fail if no match is found, and there is no `match.otherwise`', () => {
                 assert.throws(() => {
                     const actual = match('unmatched', [
                         match.case(x => x === 'foo', true),
@@ -81,7 +81,7 @@ describe('match.js', function() {
                 });
             });
             
-            it('should select `match.otherwise` if no match is found', function() {
+            it('should select `match.otherwise` if no match is found', () => {
                 const actual = match('unmatched', [
                     match.case(x => x === 'foo', false),
                     match.case(x => x === 'bar', false),
@@ -92,16 +92,16 @@ describe('match.js', function() {
         });
     });
     
-    describe('matchType', function() {
-        it('should fail if subject is non-object', function() {
+    describe('matchType', () => {
+        it('should fail if subject is non-object', () => {
             assert.throws(() => { matchType(42); });
         });
         
-        it('should fail if subject does not have a `type` property', function() {
+        it('should fail if subject does not have a `type` property', () => {
             assert.throws(() => { matchType({ notType: 42 }); });
         });
         
-        it('should use type to match on a case object', function() {
+        it('should use type to match on a case object', () => {
             const actual = matchType({ type: 'y' }, {
                 x: false,
                 y: true,
@@ -110,7 +110,7 @@ describe('match.js', function() {
             assert.strictEqual(actual, true);
         });
         
-        it('should pass the entire object to functions', function() {
+        it('should pass the entire object to functions', () => {
             const actual = matchType({ type: 'y', value: 42 }, {
                 x: false,
                 y: ({ type, value }) => ({ type, value }),
@@ -119,7 +119,7 @@ describe('match.js', function() {
             assert.deepStrictEqual(actual, { type: 'y', value: 42 });
         });
         
-        it('should work with predicates', function() {
+        it('should work with predicates', () => {
             const actual = matchType({ type: 'y', value: 42 }, [
                 match.case(type => type === 'x', false),
                 match.case(type => type === 'y', ({ value }) => value),
@@ -129,17 +129,17 @@ describe('match.js', function() {
         });
     });
     
-    describe('matchSingleKey', function() {
-        it('should fail if subject is non-object', function() {
+    describe('matchSingleKey', () => {
+        it('should fail if subject is non-object', () => {
             assert.throws(() => { matchSingleKey(42); });
         });
         
-        it('should fail if subject does not have exactly one property', function() {
+        it('should fail if subject does not have exactly one property', () => {
             assert.throws(() => { matchSingleKey({}); });
             assert.throws(() => { matchSingleKey({ x: null, y: null }); });
         });
         
-        it('should use single key to match on a case object', function() {
+        it('should use single key to match on a case object', () => {
             const actual = matchSingleKey({ y: 42 }, {
                 x: false,
                 y: true,
@@ -148,7 +148,7 @@ describe('match.js', function() {
             assert.strictEqual(actual, true);
         });
         
-        it('should pass just the property value to functions', function() {
+        it('should pass just the property value to functions', () => {
             const actual = matchSingleKey({ y: 42 }, {
                 x: false,
                 y: value => value,
@@ -157,7 +157,7 @@ describe('match.js', function() {
             assert.deepStrictEqual(actual, 42);
         });
         
-        it('should work with predicates', function() {
+        it('should work with predicates', () => {
             const actual = matchSingleKey({ y: { value: 42 } }, [
                 match.case(key => key === 'x', false),
                 match.case(key => key === 'y', ({ value }) => value),

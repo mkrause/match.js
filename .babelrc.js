@@ -18,11 +18,14 @@ module.exports = {
             // https://github.com/babel/babel-preset-env/issues/203
             useBuiltIns: 'usage',
             
+            // Use core-js v3
+            // See: https://babeljs.io/blog/2019/03/19/7.4.0
+            corejs: 3,
+            
             // Whether to transpile modules
             modules: target === 'cjs' ? 'commonjs' : false,
         }],
     ],
     plugins: [
-        '@babel/proposal-object-rest-spread',     // `{ ...obj }`
     ],
 };
