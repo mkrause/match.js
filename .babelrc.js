@@ -6,6 +6,7 @@ module.exports = {
         ['@babel/env', {
             targets: {
                 browsers: [
+                    'node 8.9', // Support Node v8.9 LTS (Carbon)
                     '>0.1%',
                     'not dead',
                     'not OperaMini all',

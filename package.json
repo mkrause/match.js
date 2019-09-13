@@ -1,19 +1,19 @@
 {
     "name": "@mkrause/match",
     "version": "1.2.0",
-    "description": "JavaScript case matching utility.",
+    "description": "JavaScript case matching library.",
     "author": "mkrause",
     "license": "MIT",
     "repository": "https://github.com/mkrause/match.js",
-    "es2015": "src/match.js",
-    "main": "lib-cjs/match.js",
-    "module": "lib-esm/match.js",
-    "browser": "lib-esm/match.js",
     "files": [
         "src/",
         "lib-cjs/",
         "lib-esm/"
     ],
+    "es2015": "src/match.js",
+    "main": "lib-cjs/match.js",
+    "module": "lib-esm/match.js",
+    "browser": "lib-esm/match.js",
     "scripts": {
         "build:cjs": "NODE_ENV=production BABEL_ENV=cjs babel src --out-dir lib-cjs --source-maps inline",
         "build:esm": "NODE_ENV=production BABEL_ENV=esm babel src --out-dir lib-esm --source-maps inline",
@@ -21,14 +21,14 @@
         "prepublishOnly": "npm run build:cjs && npm run build:esm"
     },
     "devDependencies": {
-        "@babel/core": "^7.4.3",
-        "@babel/register": "^7.4.0",
-        "@babel/cli": "^7.4.3",
-        "@babel/preset-env": "^7.4.3",
-        "mocha": "^6.1.4"
+        "@babel/core": "^7.6.0",
+        "@babel/register": "^7.6.0",
+        "@babel/cli": "^7.6.0",
+        "@babel/preset-env": "^7.6.0",
+        "mocha": "^6.2.0"
     },
     "dependencies": {
-        "core-js": "^3.0.1",
-        "lodash": "^4.17.11"
+        "core-js": "^3.2.1",
+        "lodash": "^4.17.15"
     }
 }
