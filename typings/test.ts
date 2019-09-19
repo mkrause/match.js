@@ -37,16 +37,16 @@ const test2 : 'test' = match('foo', {
 
 // Expected error: Type 'boolean' is not assignable to type '"test"'.
 const test3 : 'test' = match('nonexistent', {
+    [match.default]: true,
     foo: (tag : string) : number => 42,
     bar: 'hello',
-    '__@@default': true,
 });
 
 // Expected error: Type 'boolean' is not assignable to type '"test"'.
 const test4 : 'test' = match('nonexistent', {
+    [match.default]: () : boolean => true,
     foo: (tag : string) : number => 42,
     bar: 'hello',
-    '__@@default': () : boolean => true,
 });
 
 // Expected error: none (result should be type `never`, which is assignable to any type)

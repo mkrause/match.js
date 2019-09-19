@@ -64,7 +64,19 @@ declare module '@mkrause/match' {
     // Check if the matched case is a function, if so use the return type of that function
     type ResolveCase<C> = C extends ((...args : any[]) => infer R) ? R : C;
     
-    export function match<D extends string, C extends object, DEF extends typeof defaultCase>(
+    // export function match<D extends string, C extends object, DEF extends typeof defaultCase>(
+    //         discriminator : D,
+    //         cases : C,
+    //     )
+    //     : D extends keyof C // Check if the discriminator exists within the case list
+    //         ? ResolveCase<C[D]>
+    //         : (
+    //             // Check if the case list has a "default" case, if so return its type
+    //             DEF extends keyof C ? ResolveCase<C[DEF]> : never
+    //         );
+    
+    export const match : {
+        <D extends string, C extends object, DEF extends typeof defaultCase>(
             discriminator : D,
             cases : C,
         )
@@ -74,6 +86,8 @@ declare module '@mkrause/match' {
                 // Check if the case list has a "default" case, if so return its type
                 DEF extends keyof C ? ResolveCase<C[DEF]> : never
             );
+        default : typeof defaultCase;
+    };
     
     export default match;
 }
