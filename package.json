@@ -8,12 +8,14 @@
     "files": [
         "src/",
         "lib-cjs/",
-        "lib-esm/"
+        "lib-esm/",
+        "typings/"
     ],
     "es2015": "src/match.js",
     "main": "lib-cjs/match.js",
     "module": "lib-esm/match.js",
     "browser": "lib-esm/match.js",
+    "types": "typings/match.d.ts",
     "scripts": {
         "build:cjs": "NODE_ENV=production BABEL_ENV=cjs babel src --out-dir lib-cjs --source-maps inline",
         "build:esm": "NODE_ENV=production BABEL_ENV=esm babel src --out-dir lib-esm --source-maps inline",

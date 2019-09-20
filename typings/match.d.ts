@@ -10,6 +10,7 @@ declare module '@mkrause/match' {
     
     // export const defaultKey : typeof defaultCase;
     const defaultCase = '__@@default';
+    // const defaultCase : symbol;
     
     type Discr = string | number | symbol; // Anything that can be used to index into an object
     
