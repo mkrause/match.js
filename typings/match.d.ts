@@ -7,9 +7,9 @@ declare module '@mkrause/match' {
     
     // Resolve the given case to its result type. For example:
     // - In `{ foo: 42 }`, `foo` has result type `number`
-    // - In `{ foo: () => 42 }`, `foo` again has result type `number` (take the function return type)
-    // Note: this will also work if `C` is a union (see: "distributive conditionals" in TypeScript). Thus, this
-    // will also work for multiple cases (subset of a case list).
+    // - In `{ foo: () => 42 }`, `foo` also has result type `number` (will take the function return type)
+    // Note: this type will also work if `C` is a union (see: "distributive conditionals" in TypeScript). Thus,
+    // this will also work for multiple cases at once.
     type ResolveCase<C> = C extends ((discr : Discr) => infer R) ? R : C;
     
     // Type for the default matcher `match`.
