@@ -10,7 +10,11 @@ declare module '@mkrause/match' {
     // - In `{ foo: () => 42 }`, `foo` also has result type `number` (will take the function return type)
     // Note: this type will also work if `C` is a union (see: "distributive conditionals" in TypeScript). Thus,
     // this will also work for multiple cases at once.
-    type ResolveCase<C> = C extends ((discr : Discr) => infer R) ? R : C;
+    type ResolveCase<C, S> = C extends Function
+        ? C extends ((subject : S) => infer R)
+            ? R // Return the return type of the callback
+            : unknown // Return `unknown` if wrong function type (best thing we can do to make the checker crash)
+        : C;
     
     // Type for the default matcher `match`.
     // Note that in the most general case (unknown discriminator), the best we can do is to return the union of
@@ -21,9 +25,9 @@ declare module '@mkrause/match' {
             discriminator : D,
             cases : C,
         )
-        => D extends keyof C // Check if the discriminator exists within the case list
-            ? ResolveCase<C[D]>
-            : ResolveCase<C[keyof C]>; // Return the union of all possible (resolved) return values
+        => D extends keyof C // Check if the discriminator is known to be a subtype of the possible cases
+            ? ResolveCase<C[D], D>
+            : ResolveCase<C[keyof C], D>; // Return the union of all possible (resolved) return values
     
     export const match : MatchFn & {
         default : typeof defaultCase,

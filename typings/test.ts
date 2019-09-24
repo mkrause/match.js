@@ -36,6 +36,13 @@ const test2 : 'test2' = match('foo', {
     bar: 'hello',
 });
 
+// Same as test2, but use an invalid callback function type (this is an error by the caller, not `match`)
+// Expected error: Type 'unknown' is not assignable to type '"test2_invalidFunctionType"'.
+const test2_invalidFunctionType : 'test2_invalidFunctionType' = match('foo', {
+    foo: (tag : boolean) : number => 42,
+    bar: 'hello',
+});
+
 // Expected error: Type 'string | number | boolean' is not assignable to type '"test3"'.
 const test3 : 'test3' = match('nonexistent', {
     [match.default]: true,
