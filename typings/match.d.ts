@@ -2,7 +2,7 @@
 declare module '@mkrause/match' {
     const defaultCase : unique symbol;
     
-    type Discr = keyof any; // Discriminator is any possible object index (`string | number | symbol`)
+    type Discrim = keyof any; // Discriminator is any possible object index (`string | number | symbol`)
     type CaseList = object; // Case list can be any arbitrary object
     
     // Resolve the given case to its result type. For example:
@@ -21,7 +21,7 @@ declare module '@mkrause/match' {
     // all (resolved) case types. However, if we know that the discriminator is a subtype of `keyof C`, then we
     // can specifically return those case types. In particular, if the discriminator is a literal type, then we
     // can return the exact type of the matched case.
-    type MatchFn = <D extends Discr, C extends CaseList>(
+    type MatchFn = <C extends CaseList, D extends Discrim>(
             discriminator : D,
             cases : C,
         )
@@ -32,6 +32,28 @@ declare module '@mkrause/match' {
     export const match : MatchFn & {
         default : typeof defaultCase,
     };
+    
+    export const matchType : <C extends CaseList, T extends Discrim, S extends { type : T }>(
+            subject : S,
+            cases : C,
+        )
+        => S['type'] extends keyof C
+            ? ResolveCase<C[S['type']], S['type']>
+            : ResolveCase<C[keyof C], S['type']>;
+    
+    export const matchSingleKey : any;
+    // export const matchSingleKey : <C extends CaseList, K extends Discrim, V, S extends { [K] : V }>(
+    //         subject : S,
+    //         cases : C,
+    //     )
+    //     => S[K] extends keyof C
+    //         ? ResolveCase<C[S[K]], S[K]>
+    //         : ResolveCase<C[keyof C], S[K]>;
+    
+    export const matcher :
+        <S, B>(parseSubject : (subject : S) => { discriminator : Discrim, body : B })
+        => <C extends CaseList>(subject : S, cases : C)
+        => ResolveCase<C[keyof C], B>;
     
     export default match;
 }
