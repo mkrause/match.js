@@ -10,17 +10,29 @@ import { expectType, expectError } from 'tsd';
 import match, { matcher, matchType, matchSingleKey } from '@mkrause/match';
 
 
+type Eq<A, B> = [A] extends [B] ? ([B] extends [A] ? true : never) : never;
+
 /*
-// TODO: we want this to check the union *exactly*
+const expectEqualType = <T>() => <U>(value : U) => {
+    // expectType<Eq<typeof value, T>>(true as const);
+    expectType<T>(value);
+    
+    const mock : T = undefined as T;
+    expectType<U>(mock);
+};
+*/
+
+// expectType<Eq<typeof result, 42 | 'hello'>>(true as const);
+// expectEqualType<42 | 'hello'>()(...);
+
 expectType<42 | 'hello'>(
-    match('foo' as string, {
+    match('foo', {
         foo: 42 as const,
         bar: 'hello' as const,
     })
 );
-*/
 
-
+/*
 // Expected error: Type '42 | "hello"' is not assignable to type '"test1"'.
 const test0 : 'test0' = match('foo' as string, {
     foo: 42 as const,
@@ -114,3 +126,4 @@ const test_matcher_2 : 'test_matcher_2' = matcher1('foo', {
     foo: (discriminator : string) => 42 as const,
     bar: 'hello' as const,
 });
+*/
