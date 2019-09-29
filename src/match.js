@@ -52,6 +52,7 @@ export const matchType = (subject, cases) => {
     }
     
     const type = subject.type;
+    const body = subject;
     
     let matchedCase;
     if (hasOwnProperty(cases, type)) {
@@ -65,7 +66,45 @@ export const matchType = (subject, cases) => {
     if (type === '__proto__') { throw new TypeError('__proto__ is not a valid type'); }
     
     if (typeof matchedCase === 'function') {
-        return matchedCase(type);
+        return matchedCase(body);
+    } else {
+        return matchedCase;
+    }
+};
+Object.assign(matchType, matchProps);
+
+
+// Matcher: subject is an object with a single property `{ [tag] : Body }`.
+// Note: this could be written using `matcher`, but we inline instead (faster, and saves a stack entry while debugging)
+export const matchSingleKey = (subject, cases) => {
+    if (typeof subject !== 'object' || subject === null) {
+        throw new TypeError(msg`Expected object, given ${subject}`);
+    }
+    
+    // Note: use `Object.keys` rather than `Reflect.ownKeys`, so that we do not consider symbol keys. This allows
+    // the consumer to use symbol keys as an extension mechanism if needed. 
+    const subjectKeys = Object.keys(subject);
+    
+    if (subjectKeys.length !== 1) {
+        throw new TypeError(msg`Expected an object with a single key, found: ${subjectKeys}`);
+    }
+    
+    const tag = subjectKeys[0];
+    const body = subject[tag];
+    
+    let matchedCase;
+    if (hasOwnProperty(cases, tag)) {
+        matchedCase = cases[tag];
+    } else if (hasOwnProperty(cases, defaultTag)) {
+        matchedCase = cases[defaultTag];
+    } else {
+        throw new TypeError(msg`Unmatched case: ${tag}`);
+    }
+    
+    if (tag === '__proto__') { throw new TypeError('__proto__ is not a valid tag'); }
+    
+    if (typeof matchedCase === 'function') {
+        return matchedCase(body);
     } else {
         return matchedCase;
     }

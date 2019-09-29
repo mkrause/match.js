@@ -1,6 +1,6 @@
 
 import assert from 'assert';
-import { matcher, match, matchType } from '../src/match.js';
+import { match, matchType, matchSingleKey, matcher } from '../src/match.js';
 
 
 describe('match.js', () => {
@@ -198,21 +198,21 @@ describe('match.js', () => {
             assert.strictEqual(result, 'hello');
         });
         
-        it('should allow defining a case as a function, which takes the type as input', () => {
-            const result = matchType({ type: 'foo' }, {
-                foo: type => `${type}!`,
+        it('should allow defining a case as a function, which takes the entire subject as input', () => {
+            const result = matchType({ type: 'foo', message: 'hello' }, {
+                foo: subject => `${subject.message}!`,
                 bar: 42,
             });
-            assert.strictEqual(result, 'foo!');
+            assert.strictEqual(result, 'hello!');
         });
         
         it('should allow function callback for `match.default` as well', () => {
-            const result = matchType({ type: 'nonexistent' }, {
-                [match.default]: type => `${type}#`,
-                foo: type => `${type}!`,
+            const result = matchType({ type: 'nonexistent', message: 'hello' }, {
+                [match.default]: subject => `${subject.message}#`,
+                foo: subject => `${subject.message}!`,
                 bar: 42,
             });
-            assert.strictEqual(result, 'nonexistent#');
+            assert.strictEqual(result, 'hello#');
         });
         
         it('should explicitly disallow __proto__ as a possible type', () => {
@@ -223,6 +223,126 @@ describe('match.js', () => {
                     bar: 42,
                 });
             }, /__proto__/);
+        });
+    });
+    
+    describe('matchSingleKey', () => {
+        it('should fail on lack of subject argument', () => {
+            assert.throws(() => { matchSingleKey(); }, TypeError);
+        });
+        
+        it('should fail on lack of case map argument', () => {
+            assert.throws(() => { matchSingleKey({ foo: null }); }, TypeError);
+        });
+        
+        it('should fail if not given an object', () => {
+            [undefined, null, true, { x: 'hello' }, new Date()].forEach(subjectInvalid => {
+                assert.throws(() => { matchType(subjectInvalid, { foo: 42 }); }, TypeError);
+            });
+        });
+        
+        it('should fail if given an object but not with a single key', () => {
+            [{}, { x: 42, y: 43 }].forEach(subjectInvalid => {
+                assert.throws(() => { matchType(subjectInvalid, { foo: 42 }); }, TypeError);
+            });
+        });
+        
+        it('should fail if given an invalid case map', () => {
+            [undefined, null, true].forEach(casesInvalid => {
+                assert.throws(() => { matchSingleKey({ foo: null }, casesInvalid); }, TypeError);
+            });
+        });
+        
+        it('should fail as unmatched if given an empty case map', () => {
+            assert.throws(() => { matchSingleKey({ foo: null }, {}); }, /unmatched/i);
+        });
+        
+        it('should fail if no match is found, and there is no default', () => {
+            assert.throws(() => {
+                matchSingleKey({ nonexistent: null }, {
+                    foo: 42,
+                    bar: 'hello',
+                });
+            }, /unmatched/i);
+        });
+        
+        it('should select default case if no match is found, and `match.default` is present', () => {
+            const result = matchSingleKey({ nonexistent: null }, {
+                [match.default]: true,
+                x: false,
+                y: false,
+            });
+            assert.strictEqual(result, true);
+        });
+        
+        it('should return the matched case result if a match is found', () => {
+            const result = matchSingleKey({ bar: null }, {
+                foo: 42,
+                bar: 'hello',
+                baz: null,
+            });
+            assert.strictEqual(result, 'hello');
+        });
+        
+        it('should allow numeric keys', () => {
+            const result = matchSingleKey({ 42: null }, {
+                41: 'foo',
+                42: 'bar',
+                43: 'baz',
+            });
+            assert.strictEqual(result, 'bar');
+        });
+        
+        it('should not respect symbolic keys', () => {
+            // Symbol keys are not considered as keys, to allow them to be used for other purposes instead
+            // (e.g. well-known symbols, extension mechanism, etc.).
+            
+            const symbol1 = Symbol('symbol1');
+            const symbol2 = Symbol('symbol2');
+            const symbol3 = Symbol('symbol3');
+            
+            assert.throws(() => {
+                matchSingleKey({ [symbol2]: null }, {
+                    [symbol1]: 'foo',
+                    [symbol2]: 'bar',
+                    [symbol3]: 'baz',
+                });
+            }, /expected an object with a single key/i);
+        });
+        
+        it('should not allow `match.default` as a key to select the default explicitly', () => {
+            assert.throws(() => {
+                matchSingleKey({ [match.default]: null }, {
+                    foo: 42,
+                    [match.default]: 'hello',
+                    baz: null,
+                });
+            }, /expected an object with a single key/i);
+        });
+        
+        it('should allow defining a case as a function, which takes the single property value as input', () => {
+            const result = matchSingleKey({ foo: 'hello' }, {
+                foo: subject => `${subject}!`,
+                bar: 42,
+            });
+            assert.strictEqual(result, 'hello!');
+        });
+        
+        it('should allow function callback for `match.default` as well', () => {
+            const result = matchSingleKey({ nonexistent: 'hello' }, {
+                [match.default]: subject => `${subject}#`,
+                foo: subject => `${subject}!`,
+                bar: 42,
+            });
+            assert.strictEqual(result, 'hello#');
+        });
+        
+        it('should explicitly disallow __proto__ as a possible type', () => {
+            // Note: there should be no way to create an object where the `__proto__` property is enumerable,
+            // because the property is non-enumerable by default and it is not configurable.
+            // Thus creating a subject where `__proto__` is the single key should be impossible.
+            
+            assert(true);
         });
     });
     
@@ -272,6 +392,18 @@ describe('match.js', () => {
             });
             
             assert.strictEqual(result, 'body!');
+        });
+        
+        it('should explicitly disallow __proto__ as a possible tag', () => {
+            const customMatch = matcher(subject => ({ tag: subject.tag, body: 'body' }));
+            
+            assert.throws(() => {
+                matchType({ tag: '__proto__' }, {
+                    [match.default]: true,
+                    foo: 'hello',
+                    bar: 42,
+                });
+            }, /__proto__/);
         });
     });
 });
