@@ -1,97 +1,129 @@
-///<reference lib="es2018"/>
+///<reference lib="es2019"/>
 ///<reference path="./match.d.ts"/>
 
-// Test module to test TypeScript declaration file.
-// Usage:
-//   $ tsc --noEmit --strict --esModuleInterop typings/test.ts
-// See: https://stackoverflow.com/questions/49296151/how-to-write-tests-for-typescript-typing-definition
+// Test module to test TypeScript declaration.
+// Usage: `tsd`.
 
 import { expectType, expectError } from 'tsd';
 import match, { matcher, matchType, matchSingleKey } from '@mkrause/match';
 
 
-type Eq<A, B> = [A] extends [B] ? ([B] extends [A] ? true : never) : never;
+//
+// Test: `match`
+//
 
-/*
-const expectEqualType = <T>() => <U>(value : U) => {
-    // expectType<Eq<typeof value, T>>(true as const);
-    expectType<T>(value);
-    
-    const mock : T = undefined as T;
-    expectType<U>(mock);
-};
-*/
+// Fixtures: a discriminator and a case map that are as general as possible
+const discrimGeneral = undefined as unknown as (string | number | symbol);
+const casesGeneral = undefined as unknown as object;
 
-// expectType<Eq<typeof result, 42 | 'hello'>>(true as const);
-// expectEqualType<42 | 'hello'>()(...);
 
+// Scenario: both the discriminator and the case map are as general as possible
+// Note: both of these should return `never`. Reasoning: in the `{}` case, there will never be a match. In
+// the "general" (unknown type) case, we cannot distinguish this from `{}`. If you need a dynamic case map,
+// then make sure to cast to a more specific type.
+expectType<never>(match(discrimGeneral, casesGeneral)); // General case map (`keyof` is `never`)
+expectType<never>(match(discrimGeneral, {})); // Empty case map (`keyof` is `never`)
+
+
+// Scenario: case map has an indexer, but otherwise unknown keys
+// Should return `unknown` (reason: the discriminator may be present, we don't know)
+const casesIndexed = undefined as unknown as { [key : number] : unknown };
+expectType<never>(match('foo' as const, casesIndexed));
+expectType<unknown>(match(42 as const, casesIndexed));
+
+
+// Scenario: the discriminator is general, the case map is known (should return the union of all possible cases)
 expectType<42 | 'hello'>(
-    match('foo', {
+    match(discrimGeneral, {
         foo: 42 as const,
         bar: 'hello' as const,
     })
 );
 
+
+// Scenario: the discriminator is known exactly, and is present in the case map
+expectType<42>(
+    match('foo' as const, {
+        foo: 42 as const,
+        bar: 'hello' as const,
+    })
+);
+
+
+// Scenario: the discriminator is known exactly, and is not present in the case map
+// TODO: ideally this should be `never`, but we cannot currently capture this in the type definition.
+expectType<42 | 'hello'>(
+    match('nonexistent' as const, {
+        foo: 42 as const,
+        bar: 'hello' as const,
+    })
+);
+
+
+// Scenario: the case result is a function, but it is not of the required callback function type
+// Note: currently returns `unknown` to indicate a caller type error
+expectType<unknown>(
+    match('foo', {
+        foo: (discrim : boolean) => 42 as const, // Invalid callback type
+        bar: 'hello' as const,
+    })
+);
+
+
+// Scenario: the case result is a function, and it is of the right callback type
+expectType<42 | 'hello'>(
+    match(discrimGeneral, {
+        foo: (discrim : typeof discrimGeneral) => 42 as const,
+        bar: 'hello' as const,
+    })
+);
+expectType<42>(
+    match('foo' as const, {
+        foo: (discrim : typeof discrimGeneral) => 42 as const,
+        bar: 'hello' as const,
+    })
+);
+
+
+// Scenario: a default case is present
+expectType<true | 42 | 'hello'>(
+    match(discrimGeneral, {
+        [match.default]: true as const,
+        foo: (discrim : typeof discrimGeneral) => 42 as const,
+        bar: 'hello' as const,
+    })
+);
+
+// Scenario: a default case is present, and we know the discriminator is not present
+// TODO: should ideally select the type of the default case, but this is currently hard to capture
+expectType<true | 42 | 'hello'>(
+    match('nonexistent' as const, {
+        [match.default]: true as const,
+        foo: (discrim : typeof discrimGeneral) => 42 as const,
+        bar: 'hello' as const,
+    })
+);
+
+// Scenario: a default case is present, and we know the discriminator is present
+expectType<42>(
+    match('foo' as const, {
+        [match.default]: true as const,
+        foo: (discrim : typeof discrimGeneral) => 42 as const,
+        bar: 'hello' as const,
+    })
+);
+
+// Scenario: a default case is present, and we explicitly select the default case
+expectType<true>(
+    match(match.default, {
+        [match.default]: true as const,
+        foo: (discrim : typeof discrimGeneral) => 42 as const,
+        bar: 'hello' as const,
+    })
+);
+
+
 /*
-// Expected error: Type '42 | "hello"' is not assignable to type '"test1"'.
-const test0 : 'test0' = match('foo' as string, {
-    foo: 42 as const,
-    bar: 'hello' as const,
-});
-
-// Expected error: Type 'number' is not assignable to type '"test1"'.
-const test1 : 'test1' = match('foo', {
-    foo: 42 as const,
-    bar: 'hello' as const,
-});
-
-// Expected error: Type 'number' is not assignable to type '"test2"'.
-const test2 : 'test2' = match('foo', {
-    foo: (tag : string) => 42 as const,
-    bar: 'hello' as const,
-});
-
-// Same as test2, but use an invalid callback function type (this is an error by the caller, not `match`)
-// Expected error: Type 'unknown' is not assignable to type '"test2_invalidFunctionType"'.
-const test2_invalidFunctionType : 'test2_invalidFunctionType' = match('foo', {
-    foo: (tag : boolean) => 42 as const,
-    bar: 'hello' as const,
-});
-
-// Expected error: Type 'string | number | boolean' is not assignable to type '"test3"'.
-const test3 : 'test3' = match('nonexistent', {
-    [match.default]: true as const,
-    foo: (tag : string) => 42 as const,
-    bar: 'hello' as const,
-});
-
-// Expected error: Type 'string | number | boolean' is not assignable to type '"test4"'.
-const test4 : 'test4' = match('nonexistent', {
-    [match.default]: () => true as const,
-    foo: (tag : string) => 42 as const,
-    bar: 'hello' as const,
-});
-
-// Expected error: Type 'number' is not assignable to type '"test5"'.
-const test5 : 'test5' = match('nonexistent', {
-    foo: 42 as const,
-});
-
-
-// Expected error: Type 'string | number' is not assignable to type '"test6"'.
-const d : string = 'random' + Math.random();
-const test6 : 'test6' = match(d, {
-    foo: (tag : string) => 42 as const,
-    bar: 'hello' as const,
-});
-
-
-// Test scenario where the type of the case list is unknown (beyond being an `object`)
-// TODO: seems to return `never`
-const cases : object = null as unknown as object;
-const test7 : 'test7' = match(d, cases);
-
-
 const test_matchType_1 : 'test_matchType_1' = matchType({ type: 'foo' }, {
     foo: 42 as const,
     bar: 'hello' as const,

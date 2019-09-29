@@ -3,7 +3,8 @@ declare module '@mkrause/match' {
     const defaultCase : unique symbol;
     
     type Discrim = keyof any; // Discriminator is any possible object index (`string | number | symbol`)
-    type CaseList = object; // Case list can be any arbitrary object
+    // type CaseMap = object; // Case map can be any arbitrary object
+    type CaseMap = { [key : string | number] : unknown, [defaultCase] ?: unknown }
     
     // Resolve the given case to its result type. For example:
     // - In `{ foo: 42 }`, `foo` has result type `number`
@@ -21,7 +22,7 @@ declare module '@mkrause/match' {
     // all (resolved) case types. However, if we know that the discriminator is a subtype of `keyof C`, then we
     // can specifically return those case types. In particular, if the discriminator is a literal type, then we
     // can return the exact type of the matched case.
-    type MatchFn = <C extends CaseList, D extends Discrim>(
+    type MatchFn = <C extends CaseMap, D extends Discrim>(
             discriminator : D,
             cases : C,
         )
@@ -33,7 +34,7 @@ declare module '@mkrause/match' {
         default : typeof defaultCase,
     };
     
-    export const matchType : <C extends CaseList, T extends Discrim, S extends { type : T }>(
+    export const matchType : <C extends CaseMap, T extends Discrim, S extends { type : T }>(
             subject : S,
             cases : C,
         )
@@ -42,7 +43,7 @@ declare module '@mkrause/match' {
             : ResolveCase<C[keyof C], S['type']>;
     
     export const matchSingleKey : any;
-    // export const matchSingleKey : <C extends CaseList, K extends Discrim, V, S extends { [K] : V }>(
+    // export const matchSingleKey : <C extends CaseMap, K extends Discrim, V, S extends { [K] : V }>(
     //         subject : S,
     //         cases : C,
     //     )
@@ -52,7 +53,7 @@ declare module '@mkrause/match' {
     
     export const matcher :
         <S, B>(parseSubject : (subject : S) => { discriminator : Discrim, body : B })
-        => <C extends CaseList>(subject : S, cases : C)
+        => <C extends CaseMap>(subject : S, cases : C)
         => ResolveCase<C[keyof C], B>;
     
     export default match;
