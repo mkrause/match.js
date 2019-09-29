@@ -1,5 +1,5 @@
 
-# Change log
+# Changelog
 
 - v1.0
   - Initial version

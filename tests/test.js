@@ -1,169 +1,107 @@
 
-const assert = require('assert');
-const { match, matchType, matchSingleKey } = require('../src/match.js');
+import assert from 'assert';
+import match, { matcher, matchType } from '../src/match.js';
+
 
 describe('match.js', () => {
     describe('match', () => {
-        it('should fail on lack of match subject', () => {
-            assert.throws(() => { match(); });
+        it('should fail on lack of tag argument', () => {
+            assert.throws(() => { match(); }, TypeError);
         });
         
-        it('should fail on lack of match cases', () => {
-            assert.throws(() => { match('foo'); });
+        it('should fail on lack of case map argument', () => {
+            assert.throws(() => { match('foo'); }, TypeError);
         });
         
-        describe('cases through plain object', () => {
-            it('should fail on lack of cases', () => {
-                assert.throws(() => { match('foo', {}); });
-            });
-            
-            it('should match string subject with property name', () => {
-                const actual = match('foo', {
-                    foo: true,
-                    bar: false,
-                });
-                assert.strictEqual(actual, true);
-            });
-            
-            it('should fail if no match is found, and there is no `match.default`', () => {
-                assert.throws(() => {
-                    match('unmatched', {
-                        x: false,
-                        y: false,
-                    });
-                });
-            });
-            
-            it('should select `match.default` if no match is found', () => {
-                const actual = match('unmatched', {
-                    x: false,
-                    y: false,
-                    [match.default]: true,
-                });
-                assert.strictEqual(actual, true);
-            });
-            
-            it('should pass the subject as body to any function', () => {
-                const actual = match('foo', {
-                    foo: subject => subject,
-                });
-                assert.strictEqual(actual, 'foo');
+        it('should fail if given an invalid tag', () => {
+            [undefined, null, true, { x: 'hello' }, new Date()].forEach(tagInvalid => {
+                assert.throws(() => { match(tagInvalid, { foo: 42 }); }, TypeError);
             });
         });
         
-        describe('cases through predicate list', () => {
-            it('should fail on lack of predicates', () => {
-                assert.throws(() => { match('foo', []); });
+        it('should fail if given an invalid case map', () => {
+            [undefined, null, true].forEach(casesInvalid => {
+                assert.throws(() => { match('foo', casesInvalid); }, TypeError);
             });
-            
-            it('should perform structural match on object given as predicate', () => {
-                const actual = match({ type: 'x' }, [
-                    match.case({ type: 'x' }, true),
-                    match.case({ type: 'y' }, false),
-                ]);
-                assert.strictEqual(actual, true);
-            });
-            
-            it('should apply a function predicate with the subject body as argument', () => {
-                const actual = match('foo', [
-                    match.case(x => x === 'bar', false),
-                    match.case(x => x === 'foo', true),
-                ]);
-                assert.strictEqual(actual, true);
-            });
-            
-            it('should fail if no match is found, and there is no `match.otherwise`', () => {
-                assert.throws(() => {
-                    const actual = match('unmatched', [
-                        match.case(x => x === 'foo', true),
-                        match.case(x => x === 'bar', false),
-                    ]);
+        });
+        
+        it('should fail as unmatched if given an empty case map', () => {
+            assert.throws(() => { match('foo', {}); }, /unmatched/i);
+        });
+        
+        it('should fail if no match is found, and there is no default', () => {
+            assert.throws(() => {
+                match('nonexistent', {
+                    foo: 42,
+                    bar: 'hello',
                 });
-            });
-            
-            it('should select `match.otherwise` if no match is found', () => {
-                const actual = match('unmatched', [
-                    match.case(x => x === 'foo', false),
-                    match.case(x => x === 'bar', false),
-                    match.otherwise(true),
-                ]);
-                assert.strictEqual(actual, true);
-            });
-        });
-    });
-    
-    describe('matchType', () => {
-        it('should fail if subject is non-object', () => {
-            assert.throws(() => { matchType(42); });
+            }, /unmatched/i);
         });
         
-        it('should fail if subject does not have a `type` property', () => {
-            assert.throws(() => { matchType({ notType: 42 }); });
-        });
-        
-        it('should use type to match on a case object', () => {
-            const actual = matchType({ type: 'y' }, {
+        it('should select default case if no match is found, and `match.default` is present', () => {
+            const result = match('nonexistent', {
+                [match.default]: true,
                 x: false,
-                y: true,
-                [match.default]: false,
+                y: false,
             });
-            assert.strictEqual(actual, true);
+            assert.strictEqual(result, true);
         });
         
-        it('should pass the entire object to functions', () => {
-            const actual = matchType({ type: 'y', value: 42 }, {
-                x: false,
-                y: ({ type, value }) => ({ type, value }),
-                [match.default]: false,
+        it('should return the matched case result if a match is found', () => {
+            const result = match('bar', {
+                foo: 42,
+                bar: 'hello',
+                baz: null,
             });
-            assert.deepStrictEqual(actual, { type: 'y', value: 42 });
+            assert.strictEqual(result, 'hello');
         });
         
-        it('should work with predicates', () => {
-            const actual = matchType({ type: 'y', value: 42 }, [
-                match.case(type => type === 'x', false),
-                match.case(type => type === 'y', ({ value }) => value),
-                match.otherwise(false),
-            ]);
-            assert.deepStrictEqual(actual, 42);
-        });
-    });
-    
-    describe('matchSingleKey', () => {
-        it('should fail if subject is non-object', () => {
-            assert.throws(() => { matchSingleKey(42); });
-        });
-        
-        it('should fail if subject does not have exactly one property', () => {
-            assert.throws(() => { matchSingleKey({}); });
-            assert.throws(() => { matchSingleKey({ x: null, y: null }); });
-        });
-        
-        it('should use single key to match on a case object', () => {
-            const actual = matchSingleKey({ y: 42 }, {
-                x: false,
-                y: true,
-                [match.default]: false,
+        it('should allow numeric keys', () => {
+            const result = match(42, {
+                41: 'foo',
+                42: 'bar',
+                43: 'baz',
             });
-            assert.strictEqual(actual, true);
+            assert.strictEqual(result, 'bar');
         });
         
-        it('should pass just the property value to functions', () => {
-            const actual = matchSingleKey({ y: 42 }, {
-                x: false,
-                y: value => value,
-                [match.default]: false,
+        it('should allow symbolic keys', () => {
+            const symbol1 = Symbol('symbol1');
+            const symbol2 = Symbol('symbol2');
+            const symbol3 = Symbol('symbol3');
+            
+            const result = match(symbol2, {
+                [symbol1]: 'foo',
+                [symbol2]: 'bar',
+                [symbol3]: 'baz',
             });
-            assert.deepStrictEqual(actual, 42);
+            assert.strictEqual(result, 'bar');
         });
         
-        it('should work with predicates', () => {
-            const actual = matchSingleKey({ y: { value: 42 } }, [
-                match.case(key => key === 'x', false),
-                match.case(key => key === 'y', ({ value }) => value),
-                match.otherwise(false),
-            ]);
-            assert.deepStrictEqual(actual, 42);
+        it('should allow `match.default` as a tag to select the default explicitly', () => {
+            const result = match(match.default, {
+                foo: 42,
+                [match.default]: 'hello',
+                baz: null,
+            });
+            assert.strictEqual(result, 'hello');
+        });
+        
+        it('should allow defining a case as a function, which takes the tag as input', () => {
+            const result = match('foo', {
+                foo: tag => `${tag}!`,
+                bar: 42,
+            });
+            assert.strictEqual(result, 'foo!');
+        });
+        
+        it('should allow function callback for `match.default` as well', () => {
+            const result = match('nonexistent', {
+                [match.default]: tag => `${tag}#`,
+                foo: tag => `${tag}!`,
+                bar: 42,
+            });
+            assert.strictEqual(result, 'nonexistent#');
         });
     });
 });

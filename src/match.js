@@ -1,146 +1,82 @@
 
-import _ from 'lodash';
+import msg from 'message-tag';
 
 
-// Utility
+// Utilities
 
-const getSingleKey = obj => {
-    if (!_.isPlainObject(obj)) {
-        throw new Error(`Error: expected object, given '${JSON.stringify(obj)}'`);
-    }
-    
-    const keys = Object.keys(obj);
-    if (keys.length !== 1) {
-        throw new Error(`Error: expected object with single key, given '${JSON.stringify(obj)}'`);
-    }
-    
-    const key = keys[0];
-    return { key, value: obj[key] };
+// Version of `obj.hasOwnProperty()` that works regardless of prototype
+const hasOwnProperty = (obj, propName) => Object.prototype.hasOwnProperty.call(obj, propName);
+
+
+const defaultTag = Symbol('match.default');
+
+
+const matchProps = {
+    default: defaultTag,
 };
 
 
-// Common definitions
-const defaultCase = Symbol('match.default');
-const defs = {
-    case: (predicate, value) => [predicate, value],
-    otherwise: fn => [defaultCase, fn],
-    default: defaultCase,
-};
-
-
-// Match against an object, where each property is one case:
-//   match('x', { x: 1, y: 2 })
-const matchAgainstObject = (discriminator, body, cases) => {
+// Matcher: subject is of type `Tag`.
+export const match = (tag, cases) => {
     let matchedCase;
-    if (cases.hasOwnProperty(discriminator)) {
-        matchedCase = cases[discriminator];
-    } else if (cases.hasOwnProperty(defs.default)) {
-        matchedCase = cases[defs.default];
+    
+    if (hasOwnProperty(cases, tag)) {
+        matchedCase = cases[tag];
+    } else if (hasOwnProperty(cases, defaultTag)) {
+        matchedCase = cases[defaultTag];
     } else {
-        throw new Error(`[match.js] Unmatched case: ${JSON.stringify(discriminator)}`);
+        throw new TypeError(msg`Unmatched case: ${tag}`);
     }
     
-    // If the property is a function, pass the subject body
-    let result;
-    if (_.isFunction(matchedCase)) {
-        result = matchedCase(body);
+    if (typeof matchedCase === 'function') {
+        return matchedCase(tag);
     } else {
-        result = matchedCase;
+        return matchedCase;
     }
-    
-    return result;
 };
+Object.assign(match, matchProps);
 
-// Match against a list of predicate functions:
-//   match({ type: 'x' }, [{ type: 'x' }, 1], [{ type: 'y' }, 2])
-const matchAgainstPredicates = (discriminator, body, predicates) => {
-    for (let [predicate, predicateCase] of predicates) {
-        // If given an object
-        if (_.isObjectLike(predicate)) {
-            predicate = _.matches(predicate);
-        }
+
+// Matcher: subject is of type `{ type : Tag }`.
+export const matchType = (subject, cases) => {
+    if (typeof subject !== 'object' || subject === null) {
+        throw new TypeError(msg`Expected object, given ${subject}`);
+    }
+    
+    // Note: use `in` operator rather than `hasOwnProperty`, it's fine if the type is further up the prototype chain
+    if (!('type' in subject)) {
+        throw new TypeError(msg`Missing property 'type' on object ${subject}`);
+    }
+    
+    return match(subject[type], cases);
+};
+Object.assign(matchType, matchProps);
+
+
+// Builder function for a custom matcher.
+export const matcher = parseSubject => {
+    const matchFn = (subject, cases) => {
+        const { tag, body } = parseSubject(subject);
         
         let matchedCase;
-        if (predicate === discriminator) {
-            matchedCase = predicateCase;
-        } else if (_.isFunction(predicate) && predicate(discriminator) == true) {
-            // Note: using weak equality (==) for predicate check
-            matchedCase = predicateCase;
-        } else if (predicate === defs.default) {
-            matchedCase = predicateCase;
-        }
         
-        if (matchedCase !== undefined) {
-            if (_.isFunction(matchedCase)) {
-                return matchedCase(body);
-            } else {
-                return matchedCase;
-            }
-        }
-    }
-    
-    // Fall-through: no match
-    throw new Error(`[match.js] Unmatched case: ${JSON.stringify(discriminator)}`);
-};
-
-
-// Create a new matcher using the given parser
-const matcher = parseSubject => {
-    const matcher = (subject, ...args) => {
-        const { discriminator, body } = parseSubject(subject);
-        
-        let result;
-        if (args.length === 1 && _.isPlainObject(args[0])) {
-            const cases = args[0];
-            result = matchAgainstObject(discriminator, body, cases);
-        } else if (args.length === 1 && _.isArray(args[0])) {
-            const predicates = args[0];
-            result = matchAgainstPredicates(discriminator, body, predicates);
-        } else if (args.length >= 1) {
-            const predicates = args;
-            result = matchAgainstPredicates(discriminator, body, predicates);
+        if (hasOwnProperty(cases, tag)) {
+            matchedCase = cases[tag];
+        } else if (hasOwnProperty(cases, defaultTag)) {
+            matchedCase = cases[defaultTag];
         } else {
-            throw new Error(`[match.js] Invalid arguments given`);
+            throw new TypeError(msg`Unmatched case: ${tag}`);
         }
         
-        return result;
+        if (typeof matchedCase === 'function') {
+            return matchedCase(body);
+        } else {
+            return matchedCase;
+        }
     };
     
-    return Object.assign(matcher, defs);
+    return Object.assign(matchFn, matchProps);
 };
 
 
-// Specific matchers
-
-// Generic match. Accept any subject, and discriminate using the value itself
-const match = matcher(subject => ({ discriminator: subject, body: subject }));
-
-// Match on objects with a `type` property
-const matchType = matcher(subject => {
-    if (!_.isObjectLike(subject)) {
-        throw new Error(`[match.js] Expected an object, given ${JSON.stringify(subject)}`);
-    }
-    if (!subject.hasOwnProperty('type')) {
-        throw new Error(`[match.js] Missing 'type' property, given ${JSON.stringify(subject)}`);
-    }
-    
-    return { discriminator: subject.type, body: subject };
-});
-
-const matchSingleKey = matcher(subject => {
-    if (!_.isObjectLike(subject)) {
-        throw new Error(`[match.js] Expected an object, given ${JSON.stringify(subject)}`);
-    }
-    
-    const keys = Object.keys(subject);
-    
-    if (keys.length !== 1) {
-        throw new Error(`[match.js] Expected an object with a single key, given ${JSON.stringify(subject)}`);
-    }
-    
-    const discriminator = keys[0];
-    return { discriminator, body: subject[discriminator] };
-});
-
-export { matcher, match, matchType, getSingleKey, matchSingleKey };
 export default match;

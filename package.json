@@ -8,27 +8,30 @@
     "files": [
         "src/",
         "lib-cjs/",
-        "lib-esm/"
+        "lib-esm/",
+        "typings/match.d.ts"
     ],
     "es2015": "src/match.js",
     "main": "lib-cjs/match.js",
     "module": "lib-esm/match.js",
     "browser": "lib-esm/match.js",
+    "types": "./typings/match.d.ts",
     "scripts": {
         "build:cjs": "NODE_ENV=production BABEL_ENV=cjs babel src --out-dir lib-cjs --source-maps inline",
         "build:esm": "NODE_ENV=production BABEL_ENV=esm babel src --out-dir lib-esm --source-maps inline",
-        "test": "NODE_ENV=development BABEL_ENV=cjs mocha --require @babel/register --recursive tests",
+        "test": "NODE_ENV=development BABEL_ENV=cjs mocha --require @babel/register --recursive tests && tsd && echo '[tsd] success'",
         "prepublishOnly": "npm run build:cjs && npm run build:esm"
     },
     "devDependencies": {
-        "@babel/core": "^7.6.0",
-        "@babel/register": "^7.6.0",
-        "@babel/cli": "^7.6.0",
-        "@babel/preset-env": "^7.6.0",
-        "mocha": "^6.2.0"
+        "@babel/core": "^7.6.2",
+        "@babel/register": "^7.6.2",
+        "@babel/cli": "^7.6.2",
+        "@babel/preset-env": "^7.6.2",
+        "typescript": "^3.6.3",
+        "tsd": "^0.9.0",
+        "mocha": "^6.2.1"
     },
     "dependencies": {
-        "core-js": "^3.2.1",
-        "lodash": "^4.17.15"
+        "message-tag": "^0.4.0"
     }
 }
