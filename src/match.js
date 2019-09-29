@@ -17,9 +17,9 @@ const matchProps = {
 
 
 // Matcher: subject is of type `Tag`.
+// Note: this could be written using `matcher`, but we inline instead (faster, and saves a stack entry while debugging)
 export const match = (tag, cases) => {
     let matchedCase;
-    
     if (hasOwnProperty(cases, tag)) {
         matchedCase = cases[tag];
     } else if (hasOwnProperty(cases, defaultTag)) {
@@ -27,6 +27,8 @@ export const match = (tag, cases) => {
     } else {
         throw new TypeError(msg`Unmatched case: ${tag}`);
     }
+    
+    if (tag === '__proto__') { throw new TypeError('__proto__ is not a valid tag'); }
     
     if (typeof matchedCase === 'function') {
         return matchedCase(tag);
@@ -38,6 +40,7 @@ Object.assign(match, matchProps);
 
 
 // Matcher: subject is of type `{ type : Tag }`.
+// Note: this could be written using `matcher`, but we inline instead (faster, and saves a stack entry while debugging)
 export const matchType = (subject, cases) => {
     if (typeof subject !== 'object' || subject === null) {
         throw new TypeError(msg`Expected object, given ${subject}`);
@@ -48,13 +51,32 @@ export const matchType = (subject, cases) => {
         throw new TypeError(msg`Missing property 'type' on object ${subject}`);
     }
     
-    return match(subject[type], cases);
+    const type = subject.type;
+    
+    let matchedCase;
+    if (hasOwnProperty(cases, type)) {
+        matchedCase = cases[type];
+    } else if (hasOwnProperty(cases, defaultTag)) {
+        matchedCase = cases[defaultTag];
+    } else {
+        throw new TypeError(msg`Unmatched case: ${type}`);
+    }
+    
+    if (type === '__proto__') { throw new TypeError('__proto__ is not a valid type'); }
+    
+    if (typeof matchedCase === 'function') {
+        return matchedCase(type);
+    } else {
+        return matchedCase;
+    }
 };
 Object.assign(matchType, matchProps);
 
 
 // Builder function for a custom matcher.
 export const matcher = parseSubject => {
+    if (typeof parseSubject !== 'function') { throw new TypeError(msg`Expected function, given ${parseSubject}`); }
+    
     const matchFn = (subject, cases) => {
         const { tag, body } = parseSubject(subject);
         
@@ -67,6 +89,8 @@ export const matcher = parseSubject => {
         } else {
             throw new TypeError(msg`Unmatched case: ${tag}`);
         }
+        
+        if (tag === '__proto__') { throw new TypeError('__proto__ is not a valid tag'); }
         
         if (typeof matchedCase === 'function') {
             return matchedCase(body);
