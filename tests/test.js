@@ -1,9 +1,15 @@
 
 import assert from 'assert';
-import { match, matchType, matchSingleKey, matcher } from '../src/match.js';
+import matchDefault, { match, matchType, matchSingleKey, matcher } from '../src/match.js';
 
 
 describe('match.js', () => {
+    describe('default export', () => {
+        it('should be the same as `match`', () => {
+            assert.strictEqual(matchDefault, match);
+        });
+    });
+    
     describe('match', () => {
         it('should fail on lack of tag argument', () => {
             assert.throws(() => { match(); }, TypeError);

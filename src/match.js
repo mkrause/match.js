@@ -120,7 +120,6 @@ export const matcher = parseSubject => {
         const { tag, body } = parseSubject(subject);
         
         let matchedCase;
-        
         if (hasOwnProperty(cases, tag)) {
             matchedCase = cases[tag];
         } else if (hasOwnProperty(cases, defaultTag)) {
