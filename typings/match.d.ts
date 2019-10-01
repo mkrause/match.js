@@ -2,19 +2,20 @@
 declare module '@mkrause/match' {
     const defaultCase : unique symbol;
     
+    // Additional properties that should be present on all match functions
     type MatchProps = {
         default : typeof defaultCase,
     };
     
     
-    type Tag = keyof any; // Tag is any possible object index (i.e. `string | number | symbol`)
+    export type Tag = keyof any; // Tag is any possible object index (i.e. `string | number | symbol`)
     
     // Note: case map should ideally extend from an indexed type `{ [key : Tag] : unknown }`.
     // But until the following issue is fixed we currently cannot use `symbol` in an index type:
     // https://github.com/microsoft/TypeScript/issues/1863
     //type CaseMap = { [key : string | number | symbol] : unknown }
     //type CaseMap = { [key : string | number] : unknown, [defaultCase] ?: unknown }
-    type CaseMap = object;
+    export type CaseMap = object;
     
     // Resolve the given case to its result type. For example:
     // - In `{ foo: 42 }`, `foo` has result type `number`
@@ -35,15 +36,17 @@ declare module '@mkrause/match' {
     export const match : MatchProps & (
         <C extends CaseMap, T extends Tag>(tag : T, cases : C) =>
             T extends keyof C // Check if the tag is known to be a subtype of the possible cases
-                ? ResolveCase<C[T], T>
-                : ResolveCase<C[keyof C], T> // Return the union of all possible (resolved) return values
+                ? ResolveCase<C[T], T> // If so, return only the subset of possible cases, resolved to their type
+                : ResolveCase<C[keyof C], T> // Otherwise, return all possible cases (resolved)
     );
     
+    
+    // Similar to `match`, except that the tag is now in a property `type`, and the body is the whole subject
     export const matchType : MatchProps & (
         <C extends CaseMap, T extends Tag, S extends { type : T }>(subject : S, cases : C) =>
             S['type'] extends keyof C
-                ? ResolveCase<C[S['type']], S['type']>
-                : ResolveCase<C[keyof C], S['type']>
+                ? ResolveCase<C[S['type']], S>
+                : ResolveCase<C[keyof C], S>
     );
     
     
