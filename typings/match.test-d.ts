@@ -242,6 +242,14 @@ const casesGeneral = undefined as unknown as object;
         })
     );
     
+    expectType<42 | 'hello' | true>(
+        matchSingleKey({ nonexistent: null }, {
+            foo: 42 as const,
+            bar: 'hello' as const,
+            [match.default]: true as const,
+        })
+    );
+    
     // Should succeed, with known case
     expectType<42>(
         matchSingleKey({ foo: null }, {

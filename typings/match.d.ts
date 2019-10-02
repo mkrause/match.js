@@ -53,14 +53,6 @@ declare module '@mkrause/match' {
     );
     
     
-    // export const matchSingleKey : any;
-    // export const matchSingleKey : MatchProps & (
-    //     <C extends CaseMap, K extends Tag, V, S extends { [K] : V }>(subject : S, cases : C) =>
-    //         S[K] extends keyof C
-    //             ? ResolveCase<C[S[K]], S[K]>
-    //             : ResolveCase<C[keyof C], S[K]>
-    // );
-    
     // Note: the following seems to be the best we can do for this function in TypeScript at the moment.
     // Consider the type variable `S`:
     //   - `K extends Tag, S extends { [K] : V }` doesn't work, because index operations must be a constant literal
@@ -73,6 +65,7 @@ declare module '@mkrause/match' {
     //         ResolveCase<C[keyof C], never>
     // );
     
+    // Warning: some dark magic below
     type DistributeCond<U, C> = U extends C ? true : never; // Take a union and distribute it over the given cond
     type IsLiteralTag<T> = DistributeCond<Tag, T> extends never ? true : false;
     
