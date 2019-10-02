@@ -13,9 +13,12 @@ declare module '@mkrause/match' {
     // Note: case map should ideally extend from an indexed type `{ [key : Tag] : unknown }`.
     // But until the following issue is fixed we currently cannot use `symbol` in an index type:
     // https://github.com/microsoft/TypeScript/issues/1863
-    //type CaseMap = { [key : string | number | symbol] : unknown }
-    //type CaseMap = { [key : string | number] : unknown, [defaultCase] ?: unknown }
-    export type CaseMap = object;
+    //export type CaseMap = { [key : string | number | symbol] : unknown }
+    //export type CaseMap = { [key : string | number] : unknown, [defaultCase] ?: unknown }
+    //export type CaseMap = object;
+    // The following seems to work, only objects can be assigned to this type, such that `keyof caseMap` = `keyof any`.
+    // Note that in messages, TS will say that subtypes have type `{ [x: string]: unknown }`, which seems to be a bug.
+    export type CaseMap = { [key in keyof any] : unknown };
     
     // Resolve the given case to its result type. For example:
     // - In `{ foo: 42 }`, `foo` has result type `number`
@@ -50,13 +53,43 @@ declare module '@mkrause/match' {
     );
     
     
-    export const matchSingleKey : any;
+    // export const matchSingleKey : any;
     // export const matchSingleKey : MatchProps & (
     //     <C extends CaseMap, K extends Tag, V, S extends { [K] : V }>(subject : S, cases : C) =>
     //         S[K] extends keyof C
     //             ? ResolveCase<C[S[K]], S[K]>
     //             : ResolveCase<C[keyof C], S[K]>
     // );
+    
+    // Note: the following seems to be the best we can do for this function in TypeScript at the moment.
+    // Consider the type variable `S`:
+    //   - `K extends Tag, S extends { [K] : V }` doesn't work, because index operations must be a constant literal
+    //     > also, TypeScript doesn't support exact types, so it cannot enforce that there's only one property
+    //   - `S extends { [key : Tag] : V }` doesn't work, because index operations must be a constant literal
+    // (1) TS doesn't support exact types
+    // (2) TS doesn't support `symbol` in indexer types, so anything involving indexers will also not work
+    // export const matchSingleKey : MatchProps & (
+    //     <C extends CaseMap, S extends object>(subject : S, cases : C) =>
+    //         ResolveCase<C[keyof C], never>
+    // );
+    
+    type DistributeCond<U, C> = U extends C ? true : never; // Take a union and distribute it over the given cond
+    type IsLiteralTag<T> = DistributeCond<Tag, T> extends never ? true : false;
+    
+    // https://stackoverflow.com/questions/50374908/transform-union-type-to-intersection-type/50375286
+    type UnionToIntersection<U> = (U extends any ? (k : U) => void : never) extends (k : infer I) => void ? I : never;
+    type IsSingleKey<K> = [K] extends [UnionToIntersection<K>] ? true : false;
+    
+    export const matchSingleKey : MatchProps & (
+        <C extends CaseMap, S extends { [key in keyof any] : unknown }>(subject : S, cases : C) =>
+            IsLiteralTag<keyof S> extends false // Check if `keyof S` consists of (a union of) literal types
+                ? ResolveCase<C[keyof C], S[keyof S]> // If not a literal, return all possible cases
+                : IsSingleKey<keyof S> extends false // Check if `keyof S` consists of a single key
+                    ? never // If not, return `never`
+                    : keyof S extends keyof C // If all is good, resolve as usual (same as other match functions)
+                        ? ResolveCase<C[keyof S], S[keyof S]>
+                        : ResolveCase<C[keyof C], S[keyof S]>
+    );
     
     
     export const matcher : <S, B>(parseSubject : (subject : S) => { tag : Tag, body : B }) =>

@@ -26,13 +26,15 @@ const casesGeneral = undefined as unknown as object;
     expectError(match(null));
     expectError(match('foo'));
     expectError(match('foo', null));
+    expectError(match(0, [1, 2, 3]));
     
     
     // Scenario: case map is of type `object` (most general type allowed), thus `keyof C` = `never`.
     // Note: ideally the case map should never be of type `object`, should be constrained to an object with an
     // explicit `keyof`. But this is currently impossible to capture (see declaration file).
     //expectType<unknown>(match('foo' as const, casesGeneral)); // Perhaps more logical (but not worth the effort)
-    expectType<never>(match('foo' as const, casesGeneral));
+    // expectType<never>(match('foo' as const, casesGeneral));
+    expectError(match('foo', casesGeneral));
     
     
     // Scenario: the case map is empty (i.e. `keyof C` = `never).
@@ -202,8 +204,58 @@ const casesGeneral = undefined as unknown as object;
 // Test: `matchSingleKey`
 {
     expectError(matchSingleKey());
+    expectError(matchSingleKey(null));
+    expectError(matchSingleKey('foo'));
+    expectError(matchSingleKey({ foo: null }));
+    expectError(matchSingleKey({ foo: null }, [1, 2, 3]));
     
-    // TODO
+    expectType<Failable<never>>(
+        matchSingleKey({ foo: null }, {})
+    );
+    
+    // Should fail due to not being single-keyed
+    expectType<never>(
+        matchSingleKey({ foo: null, bar: null }, {
+            foo: 42 as const,
+            bar: 'hello' as const,
+        })
+    );
+    expectType<never>(
+        matchSingleKey({}, {
+            foo: 42 as const,
+            bar: 'hello' as const,
+        })
+    );
+    
+    // If the subject is single-keyed, but the key is of a general type (e.g. `string`), it should resolve to all cases
+    expectType<Failable<42 | 'hello'>>(
+        matchSingleKey({ [tagGeneral]: null }, {
+            foo: 42 as const,
+            bar: 'hello' as const,
+        })
+    );
+    
+    expectType<Failable<42 | 'hello'>>(
+        matchSingleKey({ nonexistent: null }, {
+            foo: 42 as const,
+            bar: 'hello' as const,
+        })
+    );
+    
+    // Should succeed, with known case
+    expectType<42>(
+        matchSingleKey({ foo: null }, {
+            foo: 42 as const,
+            bar: 'hello' as const,
+        })
+    );
+    
+    expectType<'payload'>(
+        matchSingleKey({ foo: 'payload' as const }, {
+            foo: (payload : 'payload') => payload,
+            bar: 'hello' as const,
+        })
+    );
 };
 
 
