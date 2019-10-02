@@ -2,7 +2,7 @@
 # case-match
 
 [![npm](https://img.shields.io/npm/v/case-match.svg)](https://www.npmjs.com/package/case-match)
-[![Travis](https://img.shields.io/travis/mkrause/case-match.svg)](https://travis-ci.org/mkrause/case-match)
+[![Travis](https://img.shields.io/travis/mkrause/match.js.svg)](https://travis-ci.org/mkrause/match.js)
 
 JavaScript matching utility. Allows you to branch on a value using a list of different possible cases.
 
