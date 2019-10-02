@@ -5,8 +5,8 @@
 // Usage: `tsd`.
 
 import { expectType, expectError } from 'tsd';
-import match, { matcher, matchType, matchSingleKey } from '@mkrause/match';
-import { Tag, CaseMap } from '@mkrause/match'; // Types
+import match, { matcher, matchType, matchSingleKey } from 'case-match';
+import { Tag, CaseMap } from 'case-match'; // Types
 
 
 // Marker for return values that may throw an error. Currently just for documentation purposes, we do not actually
@@ -230,7 +230,7 @@ const casesGeneral = undefined as unknown as object;
     // If the subject is single-keyed, but the key is of a general type (e.g. `string`), it should resolve to all cases
     expectType<Failable<42 | 'hello'>>(
         matchSingleKey({ [tagGeneral]: null }, {
-            foo: 42 as const,
+            foo: (payload : null) => 42 as const,
             bar: 'hello' as const,
         })
     );

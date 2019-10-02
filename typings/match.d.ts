@@ -1,5 +1,5 @@
 
-declare module '@mkrause/match' {
+declare module 'case-match' {
     const defaultCase : unique symbol;
     
     // Additional properties that should be present on all match functions

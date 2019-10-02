@@ -1,7 +1,13 @@
 {
-    "name": "@mkrause/match",
+    "name": "case-match",
     "version": "1.2.2",
     "description": "JavaScript case matching library.",
+    "keywords": [
+        "case",
+        "match",
+        "pattern",
+        "switch"
+    ],
     "author": "mkrause",
     "license": "MIT",
     "repository": "https://github.com/mkrause/match.js",
