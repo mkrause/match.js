@@ -1,6 +1,6 @@
 
 import assert from 'assert';
-import matchDefault, { match, matchType, matchSingleKey, matcher } from '../src/match.js';
+import matchDefault, { match, matchType, matchSingleKey, matcher } from '../../src/match.js';
 
 
 describe('match.js', () => {
