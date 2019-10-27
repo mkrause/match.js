@@ -1,5 +1,3 @@
-///<reference lib="es2019"/>
-///<reference path="./match.d.ts"/>
 
 // Test module to test TypeScript declaration.
 // Usage: `tsd`.
