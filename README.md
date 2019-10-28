@@ -12,8 +12,7 @@ JavaScript matching utility. Allows you to branch on a value using a list of dif
 The `match` function takes a value, and a list of cases, and returns either the first case that matches, or an exception otherwise.
 
 ```js
-    import match from 'case-match'; // If using ES6 modules
-    const { match } = require('case-match'); // If using ES5
+    import match from 'case-match';
     
     const result = match('foo', {
         foo: 42,
