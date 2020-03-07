@@ -29,16 +29,16 @@
         "prepublishOnly": "npm run build:cjs && npm run build:esm"
     },
     "devDependencies": {
-        "@babel/core": "^7.7.2",
-        "@babel/register": "^7.7.0",
-        "@babel/cli": "^7.7.0",
-        "@babel/preset-env": "^7.7.1",
-        "typescript": "^3.7.2",
-        "tsd": "^0.10.0",
-        "mocha": "^6.2.2",
+        "@babel/core": "^7.8.7",
+        "@babel/register": "^7.8.6",
+        "@babel/cli": "^7.8.4",
+        "@babel/preset-env": "^7.8.7",
+        "typescript": "^3.8.3",
+        "tsd": "^0.11.0",
+        "mocha": "^7.1.0",
         "benny": "^3.6.14"
     },
     "dependencies": {
-        "message-tag": "^0.4.2"
+        "message-tag": "^0.4.4"
     }
 }
