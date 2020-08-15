@@ -1,6 +1,9 @@
 
 # Changelog
 
+- v2.1
+  - Drop support for Node v8
+
 - v2.0
   - [breaking] Removed support for predicate lists.
   - Added TypeScript support.
