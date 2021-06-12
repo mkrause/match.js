@@ -1,6 +1,9 @@
 
 # Changelog
 
+- v2.2
+  - Drop support for Node v10 + IE 11
+
 - v2.1
   - Drop support for Node v8
 
