@@ -1,6 +1,6 @@
 
-const b = require('benny');
-const match = require('../..').default;
+import b from 'benny';
+import match from '../../src/match.js';
 
 
 const pickRandom = items => items[Math.floor(Math.random() * items.length)];

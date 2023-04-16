@@ -4,8 +4,8 @@
 
 import { expectType, expectError } from 'tsd';
 
-import match, { matcher, matchType, matchSingleKey } from './match.js';
-import { Tag, CaseMap } from './match.js'; // Types
+import match, { matcher, matchType, matchSingleKey } from '../src/match.js';
+import { Tag, CaseMap } from '../src/match.js'; // Types
 
 
 // Marker for return values that may throw an error. Currently just for documentation purposes, we do not actually

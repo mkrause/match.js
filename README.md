@@ -1,10 +1,10 @@
 
 # case-match
 
-[![npm](https://img.shields.io/npm/v/case-match.svg?style=flat-square)](https://www.npmjs.com/package/case-match)
-[![Travis](https://img.shields.io/travis/mkrause/match.js.svg?style=flat-square)](https://travis-ci.org/mkrause/match.js)
-![MIT](https://img.shields.io/npm/l/case-match?style=flat-square)
-![TypeScript](https://img.shields.io/badge/-TypeScript-blue.svg?style=flat-square)
+[![npm](https://img.shields.io/npm/v/case-match.svg)](https://www.npmjs.com/package/case-match)
+[![GitHub Actions](https://github.com/mkrause/case-match/actions/workflows/nodejs.yml/badge.svg)](https://github.com/mkrause/case-match/actions)
+[![MIT](https://img.shields.io/npm/l/case-match)](https://github.com/mkrause/case-match)
+[![Types](https://img.shields.io/npm/types/case-match)](https://github.com/mkrause/case-match)
 
 JavaScript case matching utility. With TypeScript support.
 
@@ -90,6 +90,7 @@ matchSingleKey({ CREATE_USER: { name: 'John' } }, {
 
 ## Similar libraries
 
+- https://github.com/gvergnaud/ts-pattern
 - https://github.com/LestaD/match.js
 - https://github.com/eddieantonio/single-key
 - https://github.com/FGRibreau/match-when
