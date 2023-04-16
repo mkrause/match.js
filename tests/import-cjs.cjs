@@ -20,7 +20,7 @@ assert(typeof match.matcher === 'function');
 
 // Test: importing an ESM package from a CJS context
 import('case-match')
-  .then((msg) => {
+  .then((match) => {
     assert(typeof match.default === 'function');
     assert(typeof match.match === 'function');
     assert(typeof match.matchType === 'function');
