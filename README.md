@@ -2,9 +2,9 @@
 # case-match
 
 [![npm](https://img.shields.io/npm/v/case-match.svg)](https://www.npmjs.com/package/case-match)
-[![GitHub Actions](https://github.com/mkrause/case-match/actions/workflows/nodejs.yml/badge.svg)](https://github.com/mkrause/case-match/actions)
-[![MIT](https://img.shields.io/npm/l/case-match)](https://github.com/mkrause/case-match)
-[![Types](https://img.shields.io/npm/types/case-match)](https://github.com/mkrause/case-match)
+[![GitHub Actions](https://github.com/mkrause/match.js/actions/workflows/nodejs.yml/badge.svg)](https://github.com/mkrause/match.js/actions)
+[![MIT](https://img.shields.io/npm/l/case-match)](https://github.com/mkrause/match.js)
+[![Types](https://img.shields.io/npm/types/case-match)](https://github.com/mkrause/match.js)
 
 JavaScript case matching utility. With TypeScript support.
 
